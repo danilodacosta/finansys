@@ -10,6 +10,7 @@ import { Category } from './category.model';
   providedIn: 'root'
 })
 export class CategoryService {
+
   private apiPath = 'api/categories';
 
   constructor(private http: HttpClient) {}
@@ -71,4 +72,5 @@ export class CategoryService {
     console.log('ERROR NA REQUISIÇÃO => ', error);
     return throwError(error);
   }
+
 }
