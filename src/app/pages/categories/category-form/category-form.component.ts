@@ -8,6 +8,7 @@ import { CategoryService } from './../shared/category.service';
 import { switchMap } from 'rxjs/operators';
 
 import toastr from 'toastr';
+import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 @Component({
   selector: 'app-category-form',
@@ -36,6 +37,15 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
 
   ngAfterContentChecked() {
     this.setPageTitle();
+  }
+
+  submitForm() {
+    this.submittingForm = true;
+    if (this.currentAction === 'new') {
+       this.createCategory(); // criando categoria
+    } else {
+      this.updateCategory(); // editando categoria
+    }
   }
 
   // PRIVATE METHODS
@@ -67,7 +77,7 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
          this.category = category;
          this.categoryForm.patchValue(category); // binds loaded category data to category forms. setando valores retonados
         },
-        (error) => alert('Ocorreu um erro no servidor, tente novamente mais tarde')
+        (error) => toastr.error('Ocorreu um erro no servidor, tente novamente mais tarde')
       );
     }
   }
@@ -81,4 +91,41 @@ private setPageTitle() {
   }
 }
 
+private createCategory() {
+  const category: Category = Object.assign(new Category(), this.categoryForm.value);
+
+  this.categoryService.create(category)
+  .subscribe(
+    category => this.actionsForSuccess(category),
+    error => this.actionsForError()
+  );
 }
+
+private updateCategory() {}
+
+private actionsForSuccess(category: Category) {
+  toastr.success('Solicitação processada com sucesso!');
+
+  // skipLocationChange: true - não armazenar no historico de navegação do browser.
+  this.router.navigateByUrl('categories', {skipLocationChange: true}).then(
+    () => this.router.navigate(['categories', category.id, 'edit'])
+  );
+
+  // redirect component page.
+}
+
+private actionsForError() {
+  toastr.error('Ocorreu um erro ao processar a sua solicitação');
+
+  const error: any = 201;
+  this.submittingForm = false;
+
+  if (error.status === 422) {
+    this.serverErrorMessages = JSON.parse(error._body).errors;
+  } else {
+    this.serverErrorMessages = ['Falha na comunicação com o servidor. Por favor tente mais tarde.'];
+  }
+}
+}
+
+
