@@ -8,7 +8,6 @@ import { CategoryService } from './../shared/category.service';
 import { switchMap } from 'rxjs/operators';
 
 import toastr from 'toastr';
-import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 @Component({
   selector: 'app-category-form',
@@ -97,11 +96,20 @@ private createCategory() {
   this.categoryService.create(category)
   .subscribe(
     category => this.actionsForSuccess(category),
-    error => this.actionsForError()
+    error => this.actionsForError(error)
   );
+
 }
 
-private updateCategory() {}
+private updateCategory() {
+  const category: Category = Object.assign(new Category(), this.categoryForm.value);
+  this.categoryService.update(category)
+  .subscribe(
+    category => this.actionsForSuccess(category),
+    error => this.actionsForError(error)
+  );
+
+}
 
 private actionsForSuccess(category: Category) {
   toastr.success('Solicitação processada com sucesso!');
@@ -109,15 +117,12 @@ private actionsForSuccess(category: Category) {
   // skipLocationChange: true - não armazenar no historico de navegação do browser.
   this.router.navigateByUrl('categories', {skipLocationChange: true}).then(
     () => this.router.navigate(['categories', category.id, 'edit'])
-  );
-
-  // redirect component page.
+  ); // redirect component page.
 }
 
-private actionsForError() {
+private actionsForError(error) {
   toastr.error('Ocorreu um erro ao processar a sua solicitação');
 
-  const error: any = 201;
   this.submittingForm = false;
 
   if (error.status === 422) {
