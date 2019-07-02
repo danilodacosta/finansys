@@ -18,7 +18,7 @@
   <thead>
     <tr class="bg-primary text-light">
       <th>Lançamento</th>
-      <th>Categoria</th>
+      <th class="text-center">Categoria</th>
       <th class="text-right">Valor R$</th>
       <th class="text-center">Ações</th>
     </tr>
@@ -30,7 +30,7 @@
         <small class="text-success">{{entry.date}}</small><br>
         <small *ngIf="entry.description">{{entry.description}}</small>
       </td>
-      <td>
+      <td class="text-center">
         {{entry.category.name}}
       </td>
       <td class="text-right">
