@@ -1,5 +1,5 @@
 import { OnInit, AfterContentChecked, Injector } from '@angular/core';
-import { FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { FormBuilder, FormGroup} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { BaseResourceModel } from 'src/app/shared/models/base-resource.model';
@@ -35,8 +35,8 @@ export abstract class BaseResourceFormComponent<T extends BaseResourceModel> imp
 
   ngOnInit() {
     this.setCurrentAction();
-    this.buildCategoryForm();
-    this.loadCategory();
+    this.buildResourceForm();
+    this.loadResource();
   }
 
   ngAfterContentChecked() {
@@ -46,15 +46,15 @@ export abstract class BaseResourceFormComponent<T extends BaseResourceModel> imp
   submitForm() {
     this.submittingForm = true;
     if (this.currentAction === 'new') {
-       this.createCategory(); // criando categoria
+       this.createResource(); // criando resource
     } else {
-      this.updateCategory(); // editando categoria
+      this.updateResource(); // editando resource
     }
   }
 
-  // PRIVATE METHODS
+  // PROTECTED METHODS
 
-  private setCurrentAction() {
+  protected setCurrentAction() {
     if (this.route.snapshot.url[0].path === 'new') {
          this.currentAction = 'new';
     } else {
@@ -62,70 +62,72 @@ export abstract class BaseResourceFormComponent<T extends BaseResourceModel> imp
     }
   }
 
-  private buildCategoryForm() {
-      this.categoryForm = this.formBuilder.group({
-        id : [null],
-        name: [null, [Validators.required, Validators.minLength(2)]],
-        description: [null]
-      });
-  }
-
-  private loadCategory() {
+  protected loadResource() {
     if (this.currentAction === 'edit') {
 
         this.route.paramMap.pipe(
-          switchMap(params => this.categoryService.getById(+params.get('id')))
+          switchMap(params => this.resourceService.getById(+params.get('id')))
       )
       .subscribe(
-        (category) => {
-         this.category = category;
-         this.categoryForm.patchValue(category); // binds loaded category data to category forms. setando valores retonados
+        (resource) => {
+         this.resource = resource;
+         this.resourceForm.patchValue(resource); // binds loaded resource data to resource forms. setando valores retonados
         },
         (error) => toastr.error('Ocorreu um erro no servidor, tente novamente mais tarde')
       );
     }
   }
 
-private setPageTitle() {
+  protected setPageTitle() {
   if (this.currentAction === 'new') {
-      this.pageTitle =  'Cadastro de Nova Categoria';
+      this.pageTitle =  this.creationPageTitle();
   } else {
-    const categoryName = this.category.name || '';
-    this.pageTitle = 'Editando Categoria: ' + categoryName;
+      this.pageTitle = this.editionPageTitle();
   }
 }
 
-private createCategory() {
-  const category: Category = Object.assign(new Category(), this.categoryForm.value);
+protected creationPageTitle(): string {
+   return 'Novo';
+}
 
-  this.categoryService.create(category)
+protected editionPageTitle(): string {
+  return 'Editando';
+}
+
+protected createResource() {
+  const resource: T =  this.jsonDataToResourceFn(this.resourceForm.value);
+
+  this.resourceService.create(resource)
   .subscribe(
-    category => this.actionsForSuccess(category),
+    resource => this.actionsForSuccess(resource),
     error => this.actionsForError(error)
   );
 
 }
 
-private updateCategory() {
-  const category: Category = Object.assign(new Category(), this.categoryForm.value);
-  this.categoryService.update(category)
+protected updateResource() {
+  const resource: T =  this.jsonDataToResourceFn(this.resourceForm.value);
+
+  this.resourceService.update(resource)
   .subscribe(
-    category => this.actionsForSuccess(category),
+    resource => this.actionsForSuccess(resource),
     error => this.actionsForError(error)
   );
 
 }
 
-private actionsForSuccess(category: Category) {
+protected actionsForSuccess(resource: T) {
   toastr.success('Solicitação processada com sucesso!');
 
+  const baseComponentPath: string = this.route.snapshot.parent.url[0].path;
+
   // skipLocationChange: true - não armazenar no historico de navegação do browser.
-  this.router.navigateByUrl('categories', {skipLocationChange: true}).then(
-    () => this.router.navigate(['categories', category.id, 'edit'])
+  this.router.navigateByUrl(baseComponentPath, {skipLocationChange: true}).then(
+    () => this.router.navigate([baseComponentPath, resource.id, 'edit'])
   ); // redirect component page.
 }
 
-private actionsForError(error) {
+protected actionsForError(error) {
   toastr.error('Ocorreu um erro ao processar a sua solicitação');
 
   this.submittingForm = false;
@@ -136,6 +138,9 @@ private actionsForError(error) {
     this.serverErrorMessages = ['Falha na comunicação com o servidor. Por favor tente mais tarde.'];
   }
 }
+
+protected abstract buildResourceForm(): void;
+
 }
 
 
