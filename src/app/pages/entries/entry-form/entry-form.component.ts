@@ -1,9 +1,11 @@
-import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form.component';
-import { CategoryService } from './../../categories/shared/category.service';
 import { Component, OnInit, Injector } from '@angular/core';
 import { Validators } from '@angular/forms';
 
+import { BaseResourceFormComponent } from 'src/app/shared/components/base-resource-form/base-resource-form.component';
+
 import { Category } from './../../categories/shared/category.model';
+import { CategoryService } from './../../categories/shared/category.service';
+
 import { Entry } from './../shared/entry.model';
 import { EntryService } from './../shared/entry.service';
 
@@ -40,9 +42,10 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> impleme
   };
 
   constructor(protected entryService: EntryService,
-              private categoryService: CategoryService,
-              protected injector: Injector) {
-    super(injector, new Entry(), entryService, Entry.fromJson);
+              protected categoryService: CategoryService,
+              protected injector: Injector
+             ) {
+              super(injector, new Entry(), entryService, Entry.fromJson);
   }
 
   ngOnInit() {
