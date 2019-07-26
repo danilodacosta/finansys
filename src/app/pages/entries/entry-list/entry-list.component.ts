@@ -10,7 +10,7 @@ import { Component } from '@angular/core';
 })
 export class EntryListComponent extends BaseResourceListComponent<Entry> {
 
-   constructor(private entryService: EntryService) {
+   constructor(protected entryService: EntryService) {
      super(entryService);
    }
 
