@@ -78,7 +78,7 @@ export class EntryFormComponent extends BaseResourceFormComponent<Entry> impleme
   }
 
   protected creationPageTitle(): string {
-    return 'Cadastro novo Lançamento';
+    return 'Cadastro de Novo Lançamento';
   }
 
   protected editionPageTitle(): string {
