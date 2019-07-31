@@ -9,7 +9,6 @@ import { switchMap } from 'rxjs/operators';
 
 import toastr from 'toastr';
 
-
 export abstract class BaseResourceFormComponent<T extends BaseResourceModel> implements OnInit, AfterContentChecked {
 
   currentAction: string;
