@@ -1,0 +1,15 @@
+@mixin font-bold {
+  font-weight: bold;
+}
+
+div.card-deck {
+
+  div.card-header {
+    @include font-bold;
+  }
+
+  div.card-title {
+    @include font-bold;
+  }
+
+}
