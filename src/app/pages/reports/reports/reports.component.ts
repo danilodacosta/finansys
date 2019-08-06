@@ -6,7 +6,7 @@ import { CategoryService } from './../../categories/shared/category.service';
 import { Entry } from '../../entries/shared/entry.model';
 import { EntryService } from './../../entries/shared/entry.service';
 
-import { currencyFormatter } from 'node_modules/currency-formatter/currencies';
+import { currencyFormatter } from 'currency-formatter';
 
 @Component({
   selector: 'app-reports',
